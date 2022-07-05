@@ -145,18 +145,19 @@ func (game *GameInstance) CurrentMove() Move {
 	return Move{game.currPlayer, game.currDim1, game.currDim2}
 }
 
+//Checks if move is the same as the stored one
+func (game *GameInstance) CheckMoveForCheats(width int, heignt int) bool {
+	opt1 := width == game.currDim1 && heignt == game.currDim2
+	opt2 := width == game.currDim2 && heignt == game.currDim1
+	return !(opt1 || opt2)
+}
+
 //Try to make a move as the current player
 //	returns GameEnd if board is filled
 //	returns Cheating if provided rect dimensions differ from stored inside instance
 func (game *GameInstance) MakeMove(x int, y int, width int, heignt int) GameState {
-	if (width != game.currDim1) {
-		if (width != game.currDim2 || heignt != game.currDim1) {
-			return Cheating
-		}
-	} else {
-		if (heignt != game.currDim2) {
-			return Cheating
-		}
+	if (game.CheckMoveForCheats(width,heignt)) {
+		return Cheating
 	}
 	if (game.addRect(x, y, width, heignt, game.currPlayer)) {
 		if (game.boardComplete()) {
