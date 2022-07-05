@@ -83,6 +83,9 @@ func (game *GameInstance) addRect(x int, y int, width int, height int, player by
 	if (x + width > int(game.edge) || y + height > int(game.edge)) {
 		return false
 	}
+	if (x < 0 || y < 0) {
+		return false
+	}
 	newRect := obj.NewRect(x, y, width, height, player)
 	near := false
 	iter := game.rects.Front()

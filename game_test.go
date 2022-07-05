@@ -7,12 +7,6 @@ import (
 
 //go:generate stringer -type=GameState
 
-func (game *GameInstance) setCurrMove(dim1 int, dim2 int, player byte) {
-	game.currDim1 = dim1
-	game.currDim2 = dim2
-	game.currPlayer = player
-}
-
 func TestFirstMoves(t *testing.T) {
 	inst := NewGameInstance(Small, 2, .8)
 	move := inst.CurrentMove()
@@ -100,11 +94,11 @@ func TestCollisions(t *testing.T) {
 	for num, test := range collision {
 		res = test.Rect1.CollidesWith(&test.Rect2)
 		if (res != test.result) {
-			t.Errorf("Test %d failed on 1->2: expected %t, got %t.", num, test.result, res)
+			t.Errorf("Test %d failed on 1->2: expected %t, got %t.", num + 1, test.result, res)
 		}
 		res = test.Rect2.CollidesWith(&test.Rect1)
 		if (res != test.result) {
-			t.Errorf("Test %d failed on 2->1: expected %t, got %t.", num, test.result, res)
+			t.Errorf("Test %d failed on 2->1: expected %t, got %t.", num + 1, test.result, res)
 		}
 	}
 }
