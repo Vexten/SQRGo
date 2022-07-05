@@ -64,28 +64,28 @@ type GameInstance struct {
 }
 
 //Set current rect dims as two 6-sided die rolls
-func (this *GameInstance) generateMove() {
-	this.currDim1 = this.random.Intn(7)
-	this.currDim2 = this.random.Intn(7)
+func (game *GameInstance) generateMove() {
+	game.currDim1 = game.random.Intn(7)
+	game.currDim2 = game.random.Intn(7)
 }
 
 //Set current player num to next player in order
-func (this *GameInstance) nextPlayer() {
-	this.currPlayer++
-	if (this.currPlayer == this.players) {
-		this.currPlayer = 0
+func (game *GameInstance) nextPlayer() {
+	game.currPlayer++
+	if (game.currPlayer == game.players) {
+		game.currPlayer = 0
 	}
 }
 
 //Perform move validity checks and add a rect to collection
-func (this *GameInstance) addRect(x int, y int, width int, height int, player byte) bool {
+func (game *GameInstance) addRect(x int, y int, width int, height int, player byte) bool {
 	//check field bounds
-	if (x + width > int(this.edge) || y + height > int(this.edge)) {
+	if (x + width > int(game.edge) || y + height > int(game.edge)) {
 		return false
 	}
 	newRect := obj.NewRect(x, y, width, height, player)
 	near := false
-	iter := this.rects.Front()
+	iter := game.rects.Front()
 	for iter != nil {
 		rect := iter.Value.(obj.Rect)
 		diff := rect.Start().Diff(*newRect.Start())
@@ -101,22 +101,23 @@ func (this *GameInstance) addRect(x int, y int, width int, height int, player by
 		iter = iter.Next()
 	}
 	//also check for first turns
-	if (!near && !(this.rects.Len() < int(this.players))) {
+	if (!near && !(game.rects.Len() < int(game.players))) {
 		return false
 	}
-	this.rects.PushBack(newRect)
+	game.rects.PushBack(newRect)
 	return true
 }
 
 //Check if borad is filled
-func (this *GameInstance) boardComplete() bool {
+func (game *GameInstance) boardComplete() bool {
 	currArea := 0
-	iter := this.rects.Front()
+	iter := game.rects.Front()
 	for iter != nil {
 		currRect := iter.Value.(obj.Rect)
 		currArea += currRect.Area()
+		iter = iter.Next()
 	}
-	return (currArea > this.boardArea);
+	return (currArea > game.boardArea);
 }
 
 //Create a GameInstance with seeded generator.
@@ -140,46 +141,46 @@ func NewGameInstance(size BoardSize, players byte, endPercentage float32) *GameI
 }
 
 //Returns current move
-func (this *GameInstance) CurrentMove() Move {
-	return Move{this.currPlayer, this.currDim1, this.currDim2}
+func (game *GameInstance) CurrentMove() Move {
+	return Move{game.currPlayer, game.currDim1, game.currDim2}
 }
 
 //Try to make a move as the current player
 //	returns GameEnd if board is filled
 //	returns Cheating if provided rect dimensions differ from stored inside instance
-func (this *GameInstance) MakeMove(x int, y int, width int, heignt int) GameState {
-	if (width != this.currDim1) {
-		if (width != this.currDim2 || heignt != this.currDim1) {
+func (game *GameInstance) MakeMove(x int, y int, width int, heignt int) GameState {
+	if (width != game.currDim1) {
+		if (width != game.currDim2 || heignt != game.currDim1) {
 			return Cheating
 		}
 	} else {
-		if (heignt != this.currDim2) {
+		if (heignt != game.currDim2) {
 			return Cheating
 		}
 	}
-	if (this.addRect(x, y, width, heignt, this.currPlayer)) {
-		if (this.boardComplete()) {
+	if (game.addRect(x, y, width, heignt, game.currPlayer)) {
+		if (game.boardComplete()) {
 			return GameEnd
 		}
-		this.generateMove()
-		this.nextPlayer()
+		game.generateMove()
+		game.nextPlayer()
 		return NextMove
 	}
 	return WrongMove
 }
 
 //Generates new move and increments current player
-func (this *GameInstance) SkipMove() {
-	this.generateMove()
-	this.nextPlayer()
+func (game *GameInstance) SkipMove() {
+	game.generateMove()
+	game.nextPlayer()
 }
 
 //Calculates points and determines a winner
-func (this *GameInstance) End() Stats {
+func (game *GameInstance) End() Stats {
 	stat := Stats{}
-	results := make([]int, this.players)
+	results := make([]int, game.players)
 	max := -1
-	iter := this.rects.Front()
+	iter := game.rects.Front()
 	for iter != nil {
 		currRect := iter.Value.(obj.Rect)
 		results[currRect.Player()] += currRect.Area()
@@ -195,8 +196,8 @@ func (this *GameInstance) End() Stats {
 }
 
 //Clears the board, resets current player and generates a new move
-func (this *GameInstance) Reset() {
-	this.rects.Init()
-	this.currPlayer = 0
-	this.generateMove()
+func (game *GameInstance) Reset() {
+	game.rects.Init()
+	game.currPlayer = 0
+	game.generateMove()
 }
