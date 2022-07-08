@@ -9,12 +9,12 @@ func NewPoint(x int, y int) *Point {
 	return &Point{x, y}
 }
 
-func (this *Point) X() int {
-	return this.x
+func (point *Point) X() int {
+	return point.x
 }
 
-func (this *Point) Y() int {
-	return this.y
+func (point *Point) Y() int {
+	return point.y
 }
 
 func (a Point) Sum(b Point) Point {
@@ -41,4 +41,8 @@ func (a Point) GreaterThan(b Point) bool {
 
 func (a Point) LessThan(b Point) bool {
 	return (a.x < b.x && a.y < b.y)
+}
+
+func (a Point) Equals(b Point) bool {
+	return (a.x == b.x && a.y == b.y)
 }

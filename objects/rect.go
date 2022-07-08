@@ -1,7 +1,7 @@
 package objects
 
-//shortcut for getting Rect lines
-var lines [4][2]int = [4][2]int{{0,1},{1,2},{2,3},{3,0}}
+//line point for collision check
+var lines [4]Point = [4]Point{*NewPoint(1,0),*NewPoint(0,1),*NewPoint(-1,0),*NewPoint(0,-1)}
 
 type Rect struct {
 	origin Point
@@ -9,7 +9,7 @@ type Rect struct {
 	player byte
 }
 
-func (this *Rect) Point(i int) *Point {
+func (rect *Rect) Point(i int) *Point {
 	/*
 	(0)------(1)
 	 |		  |
@@ -20,63 +20,56 @@ func (this *Rect) Point(i int) *Point {
 		xShift = 1
 	}
 	yShift := i / 2
-	return &Point{this.origin.x + this.size.x * xShift, this.origin.y + this.size.y * yShift}
+	return &Point{rect.origin.x + rect.size.x * xShift, rect.origin.y + rect.size.y * yShift}
 }
+
+func (point *Point) inside(rect *Rect) bool {
+	return point.GreaterThan(*rect.Point(0)) && point.LessThan(*rect.Point(2))
+} 
 
 //check if line is inside of a Rect
 func (a *Rect) lineCollision(i int, b *Rect) bool {
-	//calculate difference between start and end points of both lines
-	d1 := b.Point(lines[i][0]).Diff(*(a.Point(lines[i][0])))
-	d2 := b.Point(lines[i][1]).Diff(*(a.Point(lines[i][1])))
-	/*
-	 ----(0)----
-	 |         |
-	(3)       (1)
-	 |         |
-	 ----(2)----
-	*/
-	switch i {
-		case 0:
-			return (d1.x == 0 && d2.x == 0 && d1.y > 0)
-		case 1:
-			return (d1.y == 0 && d2.y == 0 && d1.x < 0)
-		case 2:
-			return (d1.x == 0 && d2.x == 0 && d1.y < 0)
-		case 3:
-			return (d1.y == 0 && d2.y == 0 && d1.x > 0)
-		default:
-			return true
-	}
+	p1 := a.Point(i).Sum(lines[i])
+	p2 := b.Point(i).Sum(lines[i])
+	aLineColl := p1.inside(b)
+	bLineColl := p2.inside(a)
+	return (aLineColl || bLineColl)
 }
 
 func NewRect(x int, y int, width int, height int, player byte) Rect {
 	return Rect{Point{x, y}, Point{width, height}, player}
 }
 
-func (this *Rect) Start() *Point {
-	return &this.origin
+func (rect *Rect) Start() *Point {
+	return &rect.origin
 }
 
-func (this *Rect) Size() *Point {
-	return &this.size
+func (rect *Rect) Size() *Point {
+	return &rect.size
 }
 
-func (this *Rect) Player() byte {
-	return this.player
+func (rect *Rect) Player() byte {
+	return rect.player
 }
 
-func (this *Rect) Area() int {
-	return this.size.x * this.size.y
+func (rect *Rect) Area() int {
+	return rect.size.x * rect.size.y
 }
 
 func (a *Rect) CollidesWith(b *Rect) bool {
+	eqPoints := 0
 	for i := 0; i < 4; i++ {
+		bPointInsideA := b.Point(i).inside(a)
+		aPointInsideB := a.Point(i).inside(b)
 		//if any Point or any line is inside of a Rect
-		if ((b.Point(i).GreaterThan(*a.Point(0)) && b.Point(i).LessThan(*a.Point(2))) || a.lineCollision(i, b)) {
+		if (a.Point(i).Equals(*b.Point(i))) {
+			eqPoints++
+		}
+		if (bPointInsideA || aPointInsideB || a.lineCollision(i, b)) {
 			return true
 		}
 	}
-	return false
+	return eqPoints > 2
 }
 
 /*

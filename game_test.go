@@ -105,11 +105,6 @@ func TestCollisions(t *testing.T) {
 	}
 }
 
-func TestCollision(t *testing.T) {
-	test := collision[15]
-	test.Rect1.CollidesWith(&test.Rect2)
-}
-
 func TestWrong(t *testing.T) {
 	inst := NewGameInstance(Small,2,.8)
 	move := inst.CurrentMove()
