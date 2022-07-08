@@ -158,7 +158,7 @@ func NewGameInstance(size BoardSize, players byte, endPercentage float32) *GameI
 	return NewGameInstanceSeeded(size, players, endPercentage, sharedRand.Int63())
 }
 
-//Returns currently stored rects
+//Returns currently stored Rectangles
 func (game *GameInstance) Rectangles() []Rectangle {
 	ret := make([]Rectangle,game.rects.Len())
 	iter := game.rects.Front()
@@ -168,6 +168,20 @@ func (game *GameInstance) Rectangles() []Rectangle {
 		ret = append(ret, rect)
 	}
 	return ret
+}
+
+//Returns last added Rectangle.
+//If no rects are present, returns a Rectangle with Player = -1.
+func (game *GameInstance) LastRectangle() Rectangle {
+	var rect Rectangle
+	elem := game.rects.Back()
+	if elem != nil {
+		gRect := elem.Value.(obj.Rect)
+		rect = Rectangle{gRect.Start().X(),gRect.Start().Y(),gRect.Size().X(),gRect.Size().Y(),int(gRect.Player())}
+	} else {
+		rect = Rectangle{0,0,0,0,-1}
+	}
+	return rect
 }
 
 //Returns current move
