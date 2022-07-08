@@ -5,9 +5,9 @@ define a game of "Squares"
 package sqrgame
 
 import (
+	"container/list"
 	"math/rand"
 	"time"
-	"container/list"
 	obj "github.com/Vexten/SQRGo/objects"
 )
 
@@ -23,6 +23,8 @@ const (
 	ExtraLarge BoardSize = 90
 )
 
+//go:generate stringer -type=BoardSize
+
 //State of the game after an attemped Move
 type GameState byte
 
@@ -30,16 +32,17 @@ const (
 	NextMove GameState = iota
 	WrongMove
 	GameEnd
-	Cheating
 )
+
+//go:generate stringer -type=GameState
 
 //Current move.
 //	Player - player who must make a move
-//	Dim1, Dim2 - dimensions of current rect
+//	Width, Height - dimensions of current rect
 type Move struct {
 	Player byte
-	Dim1 int
-	Dim2 int
+	Width int
+	Height int
 }
 
 //Game results
@@ -148,21 +151,17 @@ func (game *GameInstance) CurrentMove() Move {
 	return Move{game.currPlayer, game.currDim1, game.currDim2}
 }
 
-//Checks if move is the same as the stored one
-func (game *GameInstance) CheckMoveForCheats(width int, heignt int) bool {
-	opt1 := width == game.currDim1 && heignt == game.currDim2
-	opt2 := width == game.currDim2 && heignt == game.currDim1
-	return !(opt1 || opt2)
-}
-
 //Try to make a move as the current player
 //	returns GameEnd if board is filled
 //	returns Cheating if provided rect dimensions differ from stored inside instance
-func (game *GameInstance) MakeMove(x int, y int, width int, heignt int) GameState {
-	if (game.CheckMoveForCheats(width,heignt)) {
-		return Cheating
+func (game *GameInstance) MakeMove(x int, y int, rotation byte) GameState {
+	width := game.currDim1
+	height := game.currDim2
+	if (rotation == 1) {
+		width = game.currDim2
+		height = game.currDim1
 	}
-	if (game.addRect(x, y, width, heignt, game.currPlayer)) {
+	if (game.addRect(x, y, width, height, game.currPlayer)) {
 		if (game.boardComplete()) {
 			return GameEnd
 		}

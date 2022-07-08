@@ -7,17 +7,15 @@ import (
 	obj "github.com/Vexten/SQRGo/objects"
 )
 
-//go:generate stringer -type=GameState
-
 func TestFirstMoves(t *testing.T) {
 	inst := NewGameInstance(Small, 2, .8)
 	move := inst.CurrentMove()
-	state := inst.MakeMove(0,0,move.Dim1,move.Dim2)
+	state := inst.MakeMove(0,0,0)
 	if (state != NextMove) {
 		t.Errorf("First move failed, got: %s",state)
 	}
 	move = inst.CurrentMove()
-	state = inst.MakeMove(int(inst.edge)-move.Dim1,int(inst.edge)-move.Dim2,move.Dim1,move.Dim2)
+	state = inst.MakeMove(int(inst.edge)-move.Width,int(inst.edge)-move.Height,0)
 	if (state != NextMove) {
 		t.Errorf("Second move failed, got: %s",state)
 	}
@@ -108,26 +106,26 @@ func TestCollisions(t *testing.T) {
 func TestWrong(t *testing.T) {
 	inst := NewGameInstance(Small,2,.8)
 	move := inst.CurrentMove()
-	t.Log("Move: (" + fmt.Sprint(move.Dim1) + ";" + fmt.Sprint(move.Dim2) + ")")
-	state := inst.MakeMove(-2,-2,move.Dim1,move.Dim2)
+	t.Log("Move: (" + fmt.Sprint(move.Width) + ";" + fmt.Sprint(move.Height) + ")")
+	state := inst.MakeMove(-2,-2,0)
 	if (state != WrongMove) {
 		t.Errorf("Negative failed, got %s", state)
 	}
-	state = inst.MakeMove(int(inst.edge),int(inst.edge),move.Dim1,move.Dim2)
+	state = inst.MakeMove(int(inst.edge),int(inst.edge),0)
 	if (state != WrongMove) {
 		t.Errorf("(size;size) failed, got %s", state)
 	}
-	state = inst.MakeMove(int(inst.edge),0,move.Dim1,move.Dim2)
+	state = inst.MakeMove(int(inst.edge),0,0)
 	if (state != WrongMove) {
 		t.Errorf("(size;0) failed, got %s", state)
 	}
-	state = inst.MakeMove(0,int(inst.edge),move.Dim1,move.Dim2)
+	state = inst.MakeMove(0,int(inst.edge),0)
 	if (state != WrongMove) {
 		t.Errorf("(0;size) failed, got %s", state)
 	}
 	inst.rects.PushBack(obj.NewRect(0,0,6,6,0))
 	inst.rects.PushBack(obj.NewRect(24,24,6,6,1))
-	state = inst.MakeMove(15,15,move.Dim1,move.Dim2)
+	state = inst.MakeMove(15,15,0)
 	if (state != WrongMove) {
 		t.Errorf("Middle failed, got %s", state)
 	}

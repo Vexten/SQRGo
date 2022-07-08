@@ -11,12 +11,11 @@ func _() {
 	_ = x[NextMove-0]
 	_ = x[WrongMove-1]
 	_ = x[GameEnd-2]
-	_ = x[Cheating-3]
 }
 
-const _GameState_name = "NextMoveWrongMoveGameEndCheating"
+const _GameState_name = "NextMoveWrongMoveGameEnd"
 
-var _GameState_index = [...]uint8{0, 8, 17, 24, 32}
+var _GameState_index = [...]uint8{0, 8, 17, 24}
 
 func (i GameState) String() string {
 	if i >= GameState(len(_GameState_index)-1) {
