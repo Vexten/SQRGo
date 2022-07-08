@@ -66,6 +66,18 @@ type GameInstance struct {
 	random *rand.Rand
 }
 
+/*
+Single rectangle that exists on the board.
+Origin is top-left corner.
+*/
+type Rectangle struct {
+	X int
+	Y int
+	Width int
+	Height int
+	Player int
+}
+
 //Set current rect dims as two 6-sided die rolls
 func (game *GameInstance) generateMove() {
 	game.currDim1 = game.random.Intn(6) + 1
@@ -144,6 +156,18 @@ func NewGameInstanceSeeded(size BoardSize, players byte, endPercentage float32, 
 //endPercentage defines how full should the board be to count as filled.
 func NewGameInstance(size BoardSize, players byte, endPercentage float32) *GameInstance {
 	return NewGameInstanceSeeded(size, players, endPercentage, sharedRand.Int63())
+}
+
+//Returns currently stored rects
+func (game *GameInstance) Rectangles() []Rectangle {
+	ret := make([]Rectangle,game.rects.Len())
+	iter := game.rects.Front()
+	for iter != nil {
+		gRect := iter.Value.(obj.Rect)
+		rect := Rectangle{gRect.Start().X(),gRect.Start().Y(),gRect.Size().X(),gRect.Size().Y(),int(gRect.Player())}
+		ret = append(ret, rect)
+	}
+	return ret
 }
 
 //Returns current move

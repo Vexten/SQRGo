@@ -3,7 +3,6 @@ package sqrgame
 import (
 	"fmt"
 	"testing"
-
 	obj "github.com/Vexten/SQRGo/objects"
 )
 
