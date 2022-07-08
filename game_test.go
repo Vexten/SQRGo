@@ -1,7 +1,9 @@
 package sqrgame
 
 import (
+	"fmt"
 	"testing"
+
 	obj "github.com/Vexten/SQRGo/objects"
 )
 
@@ -103,29 +105,41 @@ func TestCollisions(t *testing.T) {
 	}
 }
 
+func TestCollision(t *testing.T) {
+	test := collision[15]
+	test.Rect1.CollidesWith(&test.Rect2)
+}
+
 func TestWrong(t *testing.T) {
 	inst := NewGameInstance(Small,2,.8)
 	move := inst.CurrentMove()
+	t.Log("Move: (" + fmt.Sprint(move.Dim1) + ";" + fmt.Sprint(move.Dim2) + ")")
 	state := inst.MakeMove(-2,-2,move.Dim1,move.Dim2)
 	if (state != WrongMove) {
-		t.Errorf("Negative failed")
+		t.Errorf("Negative failed, got %s", state)
 	}
 	state = inst.MakeMove(int(inst.edge),int(inst.edge),move.Dim1,move.Dim2)
 	if (state != WrongMove) {
-		t.Errorf("(size;size) failed")
+		t.Errorf("(size;size) failed, got %s", state)
 	}
 	state = inst.MakeMove(int(inst.edge),0,move.Dim1,move.Dim2)
 	if (state != WrongMove) {
-		t.Errorf("(size;0) failed")
+		t.Errorf("(size;0) failed, got %s", state)
 	}
 	state = inst.MakeMove(0,int(inst.edge),move.Dim1,move.Dim2)
 	if (state != WrongMove) {
-		t.Errorf("(0;size) failed")
+		t.Errorf("(0;size) failed, got %s", state)
 	}
 	inst.rects.PushBack(obj.NewRect(0,0,6,6,0))
 	inst.rects.PushBack(obj.NewRect(24,24,6,6,1))
 	state = inst.MakeMove(15,15,move.Dim1,move.Dim2)
 	if (state != WrongMove) {
-		t.Errorf("Middle failed")
+		t.Errorf("Middle failed, got %s", state)
+	}
+}
+
+func TestWrongMulti(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		TestWrong(t)
 	}
 }

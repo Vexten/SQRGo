@@ -65,8 +65,8 @@ type GameInstance struct {
 
 //Set current rect dims as two 6-sided die rolls
 func (game *GameInstance) generateMove() {
-	game.currDim1 = game.random.Intn(7)
-	game.currDim2 = game.random.Intn(7)
+	game.currDim1 = game.random.Intn(6) + 1
+	game.currDim2 = game.random.Intn(6) + 1
 }
 
 //Set current player num to next player in order
